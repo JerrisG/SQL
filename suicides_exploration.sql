@@ -10,17 +10,17 @@ For national responses to be effective, a comprehensive multisectoral suicide pr
 SOURCE: https://www.who.int/news-room/fact-sheets/detail/suicide */
 
 /*I have created a Microsoft SQL Server Database(WHO_SUICIDES) and a new table(dbo.who_suicide) using data obtained from the WHO. 
-I will late use Tableau to create a dashboard which I will publish on Tableau public*/ 
+I will late use Tableau to create a dashboard which I will publish on Tableau public*/
 
 --Basic Exploration of Table: Obtain Row Count
-SELECT 
-	COUNT(*) row_count 
+SELECT
+  COUNT(*) row_count
 FROM WHO_SUICIDES.dbo.who_suicide
 
 
 --Basic Exploration of Table: Obtain first 100 rows
 SELECT TOP 100
-	*
+  *
 FROM WHO_SUICIDES.dbo.who_suicide
 
 --Basic Exploration of Table: List of countries in dataset(141 countries or territories located)
@@ -31,7 +31,7 @@ FROM WHO_SUICIDES.dbo.who_suicide
 
 -- Add new column that will be used to hold values based on age column
 ALTER TABLE WHO_SUICIDES.dbo.who_suicide
-    ADD [age_category] nvarchar(50);
+ADD [age_category] nvarchar(50);
 
 -- Use update command to add values based on current value in age column. These values can be used to group 	
 UPDATE t1
@@ -59,49 +59,61 @@ WHERE [age_category] = 'Children';
 
 --Basic Exploration of Table: obtain total population by country, year, and gender.
 -- result: (141 countries or territories located)
-SELECT country
-, [year]
-, sex
-, coalesce(SUM(CAST(population AS BIGINT)),0) as total_population
+SELECT
+  country,
+  [year],
+  sex,
+  COALESCE(SUM(CAST(population AS bigint)), 0) AS total_population
 FROM WHO_SUICIDES.dbo.who_suicide
-GROUP BY country, [year], sex
-ORDER BY country, [year] asc
+GROUP BY country,
+         [year],
+         sex
+ORDER BY country, [year] ASC
 
 --Basic Exploration of Table: obtain total suicides by country, year, and gender.
-SELECT country
-, [year]
-, sex
-, coalesce(SUM(CAST(suicides_no AS BIGINT)),0) as total_suicides
+SELECT
+  country,
+  [year],
+  sex,
+  COALESCE(SUM(CAST(suicides_no AS bigint)), 0) AS total_suicides
 FROM WHO_SUICIDES.dbo.who_suicide
-GROUP BY country, [year], sex
-ORDER BY country, [year] asc
+GROUP BY country,
+         [year],
+         sex
+ORDER BY country, [year] ASC
 
 -- Lets look at the suicides  United States
-SELECT [year]
-, sex
-, coalesce(SUM(CAST(suicides_no AS BIGINT)),0) as total_suicides
+SELECT
+  [year],
+  sex,
+  COALESCE(SUM(CAST(suicides_no AS bigint)), 0) AS total_suicides
 FROM WHO_SUICIDES.dbo.who_suicide
 WHERE country = 'United States of America'
-GROUP BY country, [year], sex
-ORDER BY country, [year] asc
+GROUP BY country,
+         [year],
+         sex
+ORDER BY country, [year] ASC
 
 -- Lets look at the suicides in the United States and obtain the year with the highest suicide number and gender.
 -- Results: 2015 and Males.
-WITH cte1 AS (
-SELECT [year],
-sex,
-coalesce(SUM(CAST(suicides_no AS BIGINT)),0) as total_suicides
+WITH cte1
+AS (SELECT
+  [year],
+  sex,
+  COALESCE(SUM(CAST(suicides_no AS bigint)), 0) AS total_suicides
 FROM WHO_SUICIDES.dbo.who_suicide
 WHERE country = 'United States of America'
-GROUP BY country, [year], sex
-)
-SELECT 
-[year],
-sex
+GROUP BY country,
+         [year],
+         sex)
+SELECT
+  [year],
+  sex
 FROM cte1
-GROUP BY [year], sex
+GROUP BY [year],
+         sex
 HAVING MAX(total_suicides) = (SELECT
-MAX(total_suicides)
+  MAX(total_suicides)
 FROM cte1)
 
 -- country with the most suicides.
@@ -130,17 +142,19 @@ GROUP BY country
 ORDER BY total_suicides ASC
 
 -- Lets look at the suicides in the United States by newly created column age_category
-SELECT [age_category]
-, coalesce(SUM(CAST(suicides_no AS BIGINT)),0) as total_suicides
+SELECT
+  [age_category],
+  COALESCE(SUM(CAST(suicides_no AS bigint)), 0) AS total_suicides
 FROM WHO_SUICIDES.dbo.who_suicide
 WHERE country = 'United States of America'
 GROUP BY [age_category]
-ORDER BY total_suicides asc
+ORDER BY total_suicides ASC
 
 -- Lets look at the suicides in Russia by newly created column age_category
-SELECT [age_category]
-, coalesce(SUM(CAST(suicides_no AS BIGINT)),0) as total_suicides
+SELECT
+  [age_category],
+  COALESCE(SUM(CAST(suicides_no AS bigint)), 0) AS total_suicides
 FROM WHO_SUICIDES.dbo.who_suicide
 WHERE country = 'Russian Federation'
 GROUP BY [age_category]
-ORDER BY total_suicides asc
+ORDER BY total_suicides ASC
